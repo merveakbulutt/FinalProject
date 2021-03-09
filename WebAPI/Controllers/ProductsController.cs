@@ -15,7 +15,7 @@ namespace WebAPI.Controllers
     [ApiController]
     public class ProductsController : ControllerBase
     {
-        IProductService  _productService;
+        IProductService _productService;
 
         public ProductsController(IProductService productService)
         {
@@ -56,6 +56,30 @@ namespace WebAPI.Controllers
             }
             return BadRequest(result);
         }
-           
+
+        [HttpPost("update")]
+        public IActionResult Update(Product product)
+        {
+            var result = _productService.Update(product);
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+
+            return BadRequest(result);
+        }
+
+        [HttpPost("transaction")]
+        public IActionResult TransactionTest(Product product)
+        {
+            var result = _productService.AddTransactionalTest(product);
+            if (result.Success)
+            {
+                return Ok(result.Message);
+            }
+
+            return BadRequest(result.Message);
+        }
+
     }
 }

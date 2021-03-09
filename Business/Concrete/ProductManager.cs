@@ -4,6 +4,7 @@ using Business.CCS;
 using Business.Constants;
 using Business.ValidationRules.FluentValidation;
 using Core.Aspects.Autofac.Validation;
+using Core.Aspects.Autofac.Caching;
 using Core.CrossCuttingConcerns.Validation;
 using Core.Utilities.Business;
 using Core.Utilities.Results;
@@ -16,6 +17,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Core.Aspects.Autofac.Performance;
+using System.Threading;
+using Core.Aspects.Autofac.Transaction;
 
 namespace Business.Concrete
 {
@@ -33,6 +37,7 @@ namespace Business.Concrete
 
         [SecuredOperation("product.add,admin")]
         [ValidationAspect(typeof(ProductValidator))]
+        [CacheRemoveAspect("IProductService.Get")]
         public IResult Add(Product product)
         {
 
@@ -49,9 +54,11 @@ namespace Business.Concrete
 
         }
 
+        [CacheAspect]
         public IDataResult<List<Product>> GetAll()
         {
-            if (DateTime.Now.Hour==23)
+
+            if (DateTime.Now.Hour == 23)
             {
                 return new ErrorDataResult<List<Product>>(Messages.MaintenanceTime);
             }
@@ -65,8 +72,12 @@ namespace Business.Concrete
             return new SuccessDataResult<List<Product>>(_productDal.GetAll(p => p.CategoryId == id));
         }
 
+        [CacheAspect]
+        [PerformanceAspect(2)]
         public IDataResult<Product> GetById(int productId)
         {
+            Thread.Sleep(3000);
+
             return new SuccessDataResult<Product>(_productDal.Get(p => p.ProductId == productId));
         }
 
@@ -85,6 +96,7 @@ namespace Business.Concrete
         }
 
         [ValidationAspect(typeof(ProductValidator))]
+        [CacheRemoveAspect("IProductService.Get")]
         public IResult Update(Product product)
         {
             throw new NotImplementedException();
@@ -118,6 +130,14 @@ namespace Business.Concrete
                 return new ErrorResult(Messages.CategoryLimitExceded);
             }
             return new SuccessResult();
+        }
+
+        [TransactionScopeAspect]
+        public IResult AddTransactionalTest(Product product)
+        {
+            _productDal.Update(product);
+            _productDal.Add(product);
+            return new SuccessResult(Messages.ProductUptaded);
         }
     }
 }
