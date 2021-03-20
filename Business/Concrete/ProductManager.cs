@@ -73,10 +73,10 @@ namespace Business.Concrete
         }
 
         [CacheAspect]
-        [PerformanceAspect(2)]
+      // [PerformanceAspect(2)]
         public IDataResult<Product> GetById(int productId)
         {
-            Thread.Sleep(3000);
+            //Thread.Sleep(3000);
 
             return new SuccessDataResult<Product>(_productDal.Get(p => p.ProductId == productId));
         }
@@ -137,7 +137,7 @@ namespace Business.Concrete
         {
             _productDal.Update(product);
             _productDal.Add(product);
-            return new SuccessResult(Messages.ProductUptaded);
+            return new SuccessResult(Messages.ProductUpdated);
         }
     }
 }
