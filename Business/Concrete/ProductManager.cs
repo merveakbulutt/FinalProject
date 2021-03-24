@@ -35,9 +35,9 @@ namespace Business.Concrete
       
         }
 
-        [SecuredOperation("product.add,admin")]
+        //[SecuredOperation("product.add,admin")]
         [ValidationAspect(typeof(ProductValidator))]
-        [CacheRemoveAspect("IProductService.Get")]
+        //[CacheRemoveAspect("IProductService.Get")]
         public IResult Add(Product product)
         {
 
@@ -54,7 +54,7 @@ namespace Business.Concrete
 
         }
 
-        [CacheAspect]
+        //[CacheAspect]
         public IDataResult<List<Product>> GetAll()
         {
 
@@ -72,7 +72,7 @@ namespace Business.Concrete
             return new SuccessDataResult<List<Product>>(_productDal.GetAll(p => p.CategoryId == id));
         }
 
-        [CacheAspect]
+      //  [CacheAspect]
       // [PerformanceAspect(2)]
         public IDataResult<Product> GetById(int productId)
         {
